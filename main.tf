@@ -1,6 +1,10 @@
-provider "aws" {
-  region  = var.aws_region
-  profile = var.aws_profile
+module "s3_backend" {
+  source      = "./modules/s3-backend"
+  bucket_name = "poc-terraform-state-bucket-eucentral1"
+  tags = {
+    Name        = "Terraform State Bucket"
+    Environment = "production"
+  }
 }
 
 # Call VPC Module
@@ -20,31 +24,36 @@ module "vpc" {
   tags = {
     Environment = "production"
   }
+  depends_on = [module.s3_backend]
 }
 
 # Call IAM Module
 module "iam" {
   source = "./modules/iam"
 
-  oidc_url           = "https://oidc.eks.eu-central-1.amazonaws.com/id/FF4B5D781A03AB4ECC937FCF1443EE70"
-  oidc_client_id_list = ["sts.amazonaws.com"]
-  oidc_thumbprint_list = ["9e99a48a9960b14926bb7f3b02e22da0cbed5e11"]
-  eks_admin_role_name = "eks-admin"
+  oidc_url                 = "https://oidc.eks.eu-central-1.amazonaws.com/id/FF4B5D781A03AB4ECC937FCF1443EE70"
+  oidc_client_id_list      = ["sts.amazonaws.com"]
+  oidc_thumbprint_list     = ["9e99a48a9960b14926bb7f3b02e22da0cbed5e11"]
+
+  eks_admin_role_name      = "eks-admin"
+  node_group_role_name     = "eks-node-group"  # add this to your root module call
+
   atlantis_oidc_sub_condition = "oidc.eks.eu-central-1.amazonaws.com/id/FF4B5D781A03AB4ECC937FCF1443EE70:sub"
-  atlantis_sa_name = "system:serviceaccount:default:atlantis-new"
-  atlantis_irsa_role_name = "atlantis-irsa-role"
-  atlantis_policy_name = "atlantis-iam-policy"
-  atlantis_policy_json = jsonencode({
+  atlantis_sa_name            = "system:serviceaccount:default:atlantis-new"
+  atlantis_irsa_role_name     = "atlantis-irsa-role"
+  atlantis_policy_name        = "atlantis-iam-policy"
+  atlantis_policy_json        = jsonencode({
     Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = "*",
-        Resource = "*"
-      }
-    ]
+    Statement = [{
+      Effect = "Allow"
+      Action = "*"
+      Resource = "*"
+    }]
   })
+
+  depends_on = [module.s3_backend]
 }
+
 
 # Call EKS Module
 module "eks" {
@@ -98,6 +107,7 @@ module "eks" {
   tags = {
     Environment = "production"
   }
+  depends_on = [module.vpc]
 }
 
 # Create Kubernetes Service Account for Atlantis
@@ -120,7 +130,7 @@ module "helm" {
   namespace  = "default"
   repository = "https://runatlantis.github.io/helm-charts"
   chart      = "atlantis"
-  values     = [file("${path.module}/atlantis-values.yaml")]
+  values     = [file("${path.module}/modules/helm/values/atlantis-values.yaml")]
 
-  depends_on = [module.eks]
+  depends_on = [module.eks, module.s3_backend]
 }

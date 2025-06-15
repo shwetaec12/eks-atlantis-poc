@@ -1,0 +1,17 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::895976263444:oidc-provider/oidc.eks.eu-central-1.amazonaws.com/id/C73BE2AE0D7D948ADA92A8E0DDAA1D3F"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "oidc.eks.eu-central-1.amazonaws.com/id/C73BE2AE0D7D948ADA92A8E0DDAA1D3F:sub": "system:serviceaccount:default:atlantis-new"
+        }
+      }
+    }
+  ]
+}

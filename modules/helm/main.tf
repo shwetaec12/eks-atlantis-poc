@@ -6,6 +6,4 @@ resource "helm_release" "atlantis" {
   chart      = var.chart
 
   values = var.values
-
-  depends_on = var.depends_on
 }

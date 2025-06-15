@@ -1,0 +1,22 @@
+orgAllowlist: "github.com/shwetaec12/eks-atlantis-poc"
+github:
+  user: "shwetaec12"
+  token: "" 
+  secret: "d9f7a3b1e8c54f72a6d8e9b3c1f0a7d4e5b6c7d8"
+
+repoConfig: |-
+  repos:
+    - id: github.com/shwetaec12/eks-atlantis-poc
+      
+atlantisUrl: "http://aa0a94120fa8844e187fcfb39f84328e-259313376.eu-central-1.elb.amazonaws.com"
+
+volumeClaim:
+  storageClassName: "gp3-immediate"
+
+service:
+  type: "LoadBalancer"
+
+# Use existing service account with IRSA role attached
+serviceAccount:
+  create: false
+  name: "atlantis-new"

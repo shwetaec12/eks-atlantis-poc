@@ -18,7 +18,3 @@ variable "values" {
   type = list(string)
 }
 
-variable "depends_on" {
-  type = list(any)
-  default = []
-}
