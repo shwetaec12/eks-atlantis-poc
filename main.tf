@@ -77,7 +77,7 @@ module "eks" {
       iam_role_arn   = module.iam.node_group_role_arn
     }
   }
-
+  
   aws_auth_roles = [
     {
       rolearn  = module.iam.eks_admin_arn
