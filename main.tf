@@ -31,14 +31,14 @@ module "vpc" {
 module "iam" {
   source = "./modules/iam"
 
-  oidc_url                 = "https://oidc.eks.eu-central-1.amazonaws.com/id/FF4B5D781A03AB4ECC937FCF1443EE70"
+  oidc_url                 = "https://oidc.eks.eu-central-1.amazonaws.com/id/3D6565BE4A36E46750ECFA6BDDCC98C0"
   oidc_client_id_list      = ["sts.amazonaws.com"]
   oidc_thumbprint_list     = ["9e99a48a9960b14926bb7f3b02e22da0cbed5e11"]
 
   eks_admin_role_name      = "eks-admin"
   node_group_role_name     = "eks-node-group"  # add this to your root module call
 
-  atlantis_oidc_sub_condition = "oidc.eks.eu-central-1.amazonaws.com/id/FF4B5D781A03AB4ECC937FCF1443EE70:sub"
+  atlantis_oidc_sub_condition = "oidc.eks.eu-central-1.amazonaws.com/id/3D6565BE4A36E46750ECFA6BDDCC98C0:sub"
   atlantis_sa_name            = "system:serviceaccount:default:atlantis-new"
   atlantis_irsa_role_name     = "atlantis-irsa-role"
   atlantis_policy_name        = "atlantis-iam-policy"

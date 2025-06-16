@@ -31,7 +31,7 @@
       "Sid": "KeyUsage",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::895976263444:role/my-eks-cluster-cluster-20250615060512722000000001"
+        "AWS": "arn:aws:iam::895976263444:role/poc-eks-cluster-cluster-20250615224556704300000003"
       },
       "Action": [
         "kms:ReEncrypt*",

@@ -73,3 +73,98 @@ resource "aws_iam_role_policy" "atlantis_policy" {
   role   = aws_iam_role.atlantis_irsa_role.id
   policy = var.atlantis_policy_json
 }
+
+resource "kubernetes_service_account" "atlantis_sa" {
+  metadata {
+    name      = "atlantis-new"
+    namespace = "default"
+  }
+}
+
+# RBAC: Allow atlantis-new to patch aws-auth
+resource "kubernetes_role" "aws_auth_manager" {
+  metadata {
+    name      = "aws-auth-manager"
+    namespace = "kube-system"
+  }
+
+  rule {
+    api_groups     = [""]
+    resources      = ["configmaps"]
+    resource_names = ["aws-auth"]
+    verbs          = ["get", "update", "patch"]
+  }
+}
+
+resource "kubernetes_role_binding" "aws_auth_manager_binding" {
+  metadata {
+    name      = "aws-auth-manager-binding"
+    namespace = "kube-system"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = kubernetes_role.aws_auth_manager.metadata[0].name
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = "atlantis-new"
+    namespace = "default"
+  }
+
+  depends_on = [
+    kubernetes_service_account.atlantis_sa,
+    kubernetes_role.aws_auth_manager
+  ]
+}
+
+# ✅ RBAC: Allow atlantis-new to access serviceaccounts and secrets
+# Update ClusterRole with RBAC permissions
+resource "kubernetes_cluster_role" "atlantis_rbac" {
+  metadata {
+    name = "atlantis-access"
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["secrets", "serviceaccounts"]
+    verbs      = ["get", "list", "watch"]
+  }
+
+  rule {
+    api_groups = ["rbac.authorization.k8s.io"]
+    resources  = [
+      "roles",
+      "rolebindings",
+      "clusterroles",
+      "clusterrolebindings"
+    ]
+    verbs = ["get", "list", "watch"]
+  }
+}
+
+
+resource "kubernetes_cluster_role_binding" "atlantis_rbac_binding" {
+  metadata {
+    name = "atlantis-access-binding"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.atlantis_rbac.metadata[0].name
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = "atlantis-new"
+    namespace = "default"
+  }
+
+  depends_on = [
+    kubernetes_service_account.atlantis_sa,
+    kubernetes_cluster_role.atlantis_rbac
+  ]
+}
