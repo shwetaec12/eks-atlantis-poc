@@ -1,7 +1,7 @@
 orgAllowlist: "github.com/shwetaec12/eks-atlantis-poc"
 github:
   user: "shwetaec12"
-  token: "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" 
+  token: "" 
   secret: "d9f7a3b1e8c54f72a6d8e9b3c1f0a7d4e5b6c7d8"
 
 repoConfig: |-
