@@ -1,0 +1,65 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "KeyAdministration",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::895976263444:user/shwetaec12"
+      },
+      "Action": [
+        "kms:Update*",
+        "kms:UntagResource",
+        "kms:TagResource",
+        "kms:ScheduleKeyDeletion",
+        "kms:Revoke*",
+        "kms:ReplicateKey",
+        "kms:Put*",
+        "kms:List*",
+        "kms:ImportKeyMaterial",
+        "kms:Get*",
+        "kms:Enable*",
+        "kms:Disable*",
+        "kms:Describe*",
+        "kms:Delete*",
+        "kms:Create*",
+        "kms:CancelKeyDeletion"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "KeyUsage",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::895976263444:role/poc-eks-cluster-cluster-20250615224556704300000003"
+      },
+      "Action": [
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Encrypt",
+        "kms:DescribeKey",
+        "kms:Decrypt"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowAtlantisIRSAKeyUsage",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::895976263444:role/atlantis-irsa-role"
+      },
+      "Action": [
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:ListAliases",
+        "kms:GetKeyPolicy",
+        "kms:GetKeyRotationStatus",
+        "kms:ListResourceTags"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
