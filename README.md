@@ -2,7 +2,7 @@
 
 This project provisions an AWS EKS cluster and deploys Atlantis using Helm. Atlantis is configured to use IAM Roles for Service Accounts (IRSA) for secure AWS access.
 
-## 📦 Modules Overview
+## Modules Overview
 
 1. **vpc Module**  
 Provisions the Virtual Private Cloud where EKS and other resources run.  
@@ -28,7 +28,7 @@ Deploys Atlantis via Helm on the EKS cluster.
 - Configures GitHub credentials, webhooks, and storage backend  
 - Optional PVC and volume storage  
 
-## 🚀 Deployment Steps
+## Deployment Steps
 
 1. **Initialize Terraform**
 
@@ -69,15 +69,15 @@ kubectl get svc -n atlantis
 kubectl port-forward svc/atlantis 4141:80 -n atlantis
 ```
 
-## 🧪 Debugging & Common Issues
+## Debugging & Common Issues
 
-### ❌ aws-auth ConfigMap Error
+### aws-auth ConfigMap Error
 
 ```
 Get "http://localhost/api/v1/namespaces/kube-system/configmaps/aws-auth": dial tcp [::1]:80: connectex: No connection could be made...
 ```
 
-**✅ Fix:**
+** Fix:**
 
 - Ensure you run `aws eks update-kubeconfig` after creating the cluster.  
 - Check if your kubeconfig context is set correctly.  
@@ -87,13 +87,13 @@ Get "http://localhost/api/v1/namespaces/kube-system/configmaps/aws-auth": dial t
 kubectl get nodes
 ```
 
-### ❌ Terraform STS AssumeRoleWithWebIdentity Error
+###  Terraform STS AssumeRoleWithWebIdentity Error
 
 ```
 error AccessDenied: Not authorized to perform sts:AssumeRoleWithWebIdentity
 ```
 
-**✅ Fix:**
+** Fix:**
 
 Ensure your IRSA role trust policy is correct:
 
@@ -107,13 +107,13 @@ Double-check the OIDC URL in the trust policy matches the output from:
 aws eks describe-cluster --name poc-eks-cluster --query "cluster.identity.oidc.issuer"
 ```
 
-### ❌ KMS Access Denied
+### KMS Access Denied
 
 ```
 kms:DescribeKey AccessDeniedException
 ```
 
-**✅ Fix:**
+** Fix:**
 
 Grant Atlantis IRSA role access to the KMS key:
 
@@ -123,7 +123,7 @@ aws kms put-key-policy --key-id <KEY_ID> --policy-name default --policy file://m
 
 Ensure the policy allows the role `arn:aws:sts::...:assumed-role/atlantis-irsa-role/...` to perform KMS actions.
 
-## ✅ Verifying IRSA Annotation
+##  Verifying IRSA Annotation
 
 To verify the service account has the correct role annotated:
 
@@ -146,7 +146,7 @@ kubectl apply -f ./modules/helm/values/gp2-storageclass.yaml
 
 Use these if you need dynamic volume provisioning for Atlantis.
 
-## 📁 Repo Structure
+## Repo Structure
 
 ```
 .
@@ -161,7 +161,7 @@ Use these if you need dynamic volume provisioning for Atlantis.
 └── README.md
 ```
 
-## ✅ Final Checks
+##  Final Checks
 
 Confirm `aws sts get-caller-identity` shows the correct assumed role inside the `aws-cli-debug` pod.  
 Use:
@@ -173,5 +173,3 @@ kubectl exec -it aws-cli-debug -- bash
 to run commands inside the pod for debugging.
 
 ---
-
-Happy Terraforming! 🚀
